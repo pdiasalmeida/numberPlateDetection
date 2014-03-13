@@ -1,0 +1,8 @@
+# Eclipse project files
+.classpath
+.project
+.cproject
+
+# Built objects and executables
+*.o
+lp_detector
