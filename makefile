@@ -1,7 +1,7 @@
 CC=g++
 CFLAGS=-c -g -O0 -Wall
-LDFLAGS=-lopencv_core -lopencv_highgui -lopencv_imgproc
-SOURCES=Plate.cpp ShapeBasedDetector.cpp EdgeBasedDetector.cpp lp_detector.cpp
+CFLAGS=-c -g -O0 -Wall `pkg-config --cflags opencv`
+LDFLAGS=`pkg-config --cflags --libs opencv`
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=lp_detector
 
