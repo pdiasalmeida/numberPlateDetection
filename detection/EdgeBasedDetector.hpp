@@ -1,19 +1,23 @@
 #ifndef DETECTOR_HPP_
 #define DETECTOR_HPP_
 
-#include "Plate.hpp"
+#include <opencv2/core/core.hpp>
 
 class EdgeBasedDetector
 {
 public:
 	EdgeBasedDetector();
 
-	void detect( cv::Mat image );
+	void detect();
+
 	void filter();
 	void findInterestAreas();
 	void drawInterestAreas();
+	void saveInterestAreas();
 
-	void setImage( cv::Mat image );
+	void testDir( std::string path );
+
+	void setImage( std::string imagePath );
 	cv::Mat getImage();
 
 	void setShowSteps( bool value );
@@ -39,8 +43,11 @@ protected:
 	cv::Mat _closeOut;
 	cv::Mat _result;
 
+	std::string _cImgName;
+
 	std::vector< cv::RotatedRect > _interestAreas;
-	std::vector< Plate > _output;
+	std::vector< cv::Mat > _output;
+	std::vector< std::string > _files;
 
 	bool _showSteps;
 };

@@ -1,12 +1,11 @@
 #include "ShapeBasedDetector.hpp"
+#include "../auxiliar/FilesHelper.hpp"
 
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
 #include <iostream>
 #include <sstream>
-
-#include <dirent.h>
 
 ShapeBasedDetector::ShapeBasedDetector()
 {
@@ -29,9 +28,8 @@ ShapeBasedDetector::ShapeBasedDetector()
 	_rerror = 0.3;
 }
 
-void ShapeBasedDetector::detect( cv::Mat image )
+void ShapeBasedDetector::detect()
 {
-	setImage(image);
 	filter();
 	findInterestAreas();
 }
@@ -158,8 +156,10 @@ void ShapeBasedDetector::getDims( std::vector< cv::Point > points, cv::Rect& roi
 	roi.height = maxY - minY;
 }
 
-void ShapeBasedDetector::setImage( cv::Mat image )
+void ShapeBasedDetector::setImage( std::string imagePath )
 {
+	cv::Mat image = cv::imread(imagePath);
+
 	assert( (image.channels() == 3) );
 
 	_interestAreas.clear();
@@ -183,38 +183,21 @@ void ShapeBasedDetector::setShowSteps( bool value )
 
 void ShapeBasedDetector::testDir( std::string path )
 {
-	getFileList(path);
+	_files.clear();
+	std::vector< std::string > extensions;
+	extensions.push_back("jpg");
+	extensions.push_back("png");
 
-	std::set< std::string >::iterator it = _files.begin();
+	FilesHelper::getFilesInDirectory( path, _files, extensions );
+
+	std::vector< std::string >::iterator it = _files.begin();
 	for( ; it != _files.end(); it++ )
 	{
-		_cImgName = (*it);
-		cv::Mat img = cv::imread(path+"/"+_cImgName);
-		setImage(img);
+		_cImgName = FilesHelper::getFileName(*it);
+		setImage(*it);
 
-		detect(img);
+		detect();
 		saveInterestAreas();
-	}
-}
-
-void ShapeBasedDetector::getFileList( std::string path )
-{
-	DIR *dir;
-	struct dirent *ent;
-	if( ( dir = opendir( path.c_str() ) ) != NULL )
-	{
-		while( ( ent = readdir( dir ) ) != NULL)
-		{
-			if( ent->d_type == DT_REG )
-			{
-				_files.insert( std::string( ent->d_name ) );
-			}
-		}
-		closedir (dir);
-	}
-	else
-	{
-	  std::cout << "Unable to access directory " << path << std::endl;
 	}
 }
 

@@ -1,0 +1,12 @@
+test01.jpg,2715 DTZ
+test02.jpg,3028 BYS
+test03.jpg,3154 FFY
+test04.jpg,3266 CNT
+test05.jpg,3732 FWW
+test06.jpg,5445 BSX
+test07.jpg,7215 BGN
+test08.jpg,8995 CCN
+test09.jpg,9588 DWV
+test10.jpg,9773 BNB
+test11.jpg,0226 FBV
+test12.jpg,4898 GXY

@@ -1,19 +1,19 @@
 #include "EdgeBasedDetector.hpp"
+#include "../auxiliar/FilesHelper.hpp"
 
 #include <opencv2/imgproc/imgproc.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
+#include <iostream>
 #include <sstream>
-
 
 EdgeBasedDetector::EdgeBasedDetector()
 {
 	_showSteps = false;
 }
 
-void EdgeBasedDetector::detect( cv::Mat image )
+void EdgeBasedDetector::detect()
 {
-	setImage(image);
 	filter();
 	findInterestAreas();
 }
@@ -38,6 +38,19 @@ void EdgeBasedDetector::drawInterestAreas()
 	}
 }
 
+void EdgeBasedDetector::saveInterestAreas()
+{
+	std::vector< cv::Mat >::iterator it = _output.begin();
+	int index = 1;
+	for( ; it != _output.end(); it++ )
+	{
+		std::stringstream ss;
+		ss << index;
+		cv::imwrite( "./results/"+_cImgName+"_plate_"+ss.str()+".jpg", *it );
+		index++;
+	}
+}
+
 // area of the code most dependent of plate size in the image;
 // try different methods to localize possible plates besides vertical edges
 // or different method to relate approximate edges
@@ -45,8 +58,7 @@ void EdgeBasedDetector::findInterestAreas()
 {
 	// connect all regions that have a high number of vertical edges
 	// size of the structural element varies with image size
-	// previously Size(17,3)
-	cv::Mat element = getStructuringElement( cv::MORPH_RECT, cv::Size(52, 3) );
+	cv::Mat element = getStructuringElement( cv::MORPH_RECT, cv::Size(17, 3) );
 	morphologyEx( _threshOut, _closeOut, CV_MOP_CLOSE, element );
 
 	if( _showSteps )
@@ -132,7 +144,7 @@ void EdgeBasedDetector::floodFl()
 			if( *itMask == 255 ) pointsInterest.push_back( itMask.pos() );
 		}
 
-		cv::RotatedRect minRect = minAreaRect(pointsInterest);
+		cv::RotatedRect minRect = (pointsInterest.size()>0)?minAreaRect(pointsInterest):cv::RotatedRect();
 
 		if( verifySizes(minRect) )
 		{
@@ -169,7 +181,7 @@ void EdgeBasedDetector::floodFl()
 			blur( grayResult, grayResult, cv::Size(3,3) );
 			grayResult = histEq(grayResult);
 
-			_output.push_back( Plate( grayResult, minRect.boundingRect() ) );
+			_output.push_back( grayResult );
 
 			if( _showSteps )
 			{
@@ -243,8 +255,7 @@ bool EdgeBasedDetector::verifySizes( cv::RotatedRect candidate )
 
 	//Set a min and max area. All other patches are discarded
 	int min = 15*aspect*15; // minimum area
-	// previously 125*aspect*125
-	int max = 135*aspect*135; // maximum area
+	int max = 125*aspect*125; // maximum area
 
 	//Get only patches that match to a respect ratio.
 	float rmin = aspect - aspect*error;
@@ -252,7 +263,8 @@ bool EdgeBasedDetector::verifySizes( cv::RotatedRect candidate )
 	int area = candidate.size.height * candidate.size.width;
 
 	float r = (float)candidate.size.width / (float)candidate.size.height;
-	if( r < 1 ) r = 1/r;
+	if( r < 1 )
+		r = (float)candidate.size.height / (float)candidate.size.width;
 
 	if( (area < min || area > max) || (r < rmin || r > rmax) )
 	{
@@ -262,10 +274,14 @@ bool EdgeBasedDetector::verifySizes( cv::RotatedRect candidate )
 	return result;
 }
 
-void EdgeBasedDetector::setImage( cv::Mat image )
+void EdgeBasedDetector::setImage( std::string imagePath )
 {
+	cv::Mat image = cv::imread(imagePath);
+
 	assert( (image.channels() == 3) );
-	//convert image to gray
+
+	_interestAreas.clear();
+	_output.clear();
 
 	_cImage = image.clone();
 
@@ -281,6 +297,26 @@ cv::Mat EdgeBasedDetector::getImage()
 void EdgeBasedDetector::setShowSteps( bool value )
 {
 	_showSteps = value;
+}
+
+void EdgeBasedDetector::testDir( std::string path )
+{
+	_files.clear();
+	std::vector< std::string > extensions;
+	extensions.push_back("jpg");
+	extensions.push_back("png");
+
+	FilesHelper::getFilesInDirectory( path, _files, extensions );
+
+	std::vector< std::string >::iterator it = _files.begin();
+	for( ; it != _files.end(); it++ )
+	{
+		_cImgName = FilesHelper::getFileName(*it);
+		setImage(*it);
+
+		detect();
+		saveInterestAreas();
+	}
 }
 
 EdgeBasedDetector::~EdgeBasedDetector() {}

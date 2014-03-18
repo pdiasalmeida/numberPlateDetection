@@ -3,13 +3,11 @@
 
 #include <opencv2/core/core.hpp>
 
-#include <set>
-
 class ShapeBasedDetector {
 public:
 	ShapeBasedDetector();
 
-	void detect( cv::Mat image );
+	void detect();
 
 	void filter();
 	void findInterestAreas();
@@ -18,13 +16,11 @@ public:
 
 	void testDir( std::string path );
 
-	void setImage( cv::Mat image );
+	void setImage( std::string imagePath );
 	cv::Mat getImage();
 
 	void setShowSteps( bool value );
 	void getShowSteps( bool value );
-
-	void getFileList( std::string path );
 
 	virtual ~ShapeBasedDetector();
 private:
@@ -41,7 +37,7 @@ protected:
 	std::string _cImgName;
 
 	std::vector< cv::Rect > _interestAreas;
-	std::set< std::string > _files;
+	std::vector< std::string > _files;
 
 	int _threshLower;
 	int _threshUpper;
