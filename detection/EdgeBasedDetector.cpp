@@ -181,7 +181,7 @@ void EdgeBasedDetector::floodFl()
 			blur( grayResult, grayResult, cv::Size(3,3) );
 			grayResult = histEq(grayResult);
 
-			_output.push_back( grayResult );
+			_output.push_back( resultResized );
 
 			if( _showSteps )
 			{

@@ -75,13 +75,16 @@ std::string OCRClassifier::classify()
 	std::string out(outc);
 
 	std::stringstream resultsString;
+	char chars[] = ",\n";
 
 	if( out.length() != 0 )
 	{
 		std::string testFileName = FilesHelper::getFileName(_cImgName);
+		FilesHelper::filterChars(out,chars);
 
-		resultsString << testFileName.substr(0, testFileName.find_first_of("_")) << "," << out.substr(0, out.size()-1);
-		std::cout << "Letters for image '" + _cImgName << "': " << out;
+		resultsString << testFileName.substr(0, testFileName.find_first_of("_")) << "," << out.substr(0, out.size());
+		resultsString << std::endl;
+		std::cout << "Letters for image '" + _cImgName << "': " << out << std::endl;
 	}
 	else
 		std::cout << "Could not recognise letters in '" + _cImgName << "'.\n" << std::endl;

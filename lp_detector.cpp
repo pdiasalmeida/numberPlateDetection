@@ -9,7 +9,7 @@ bool FilesHelper::debug = false;
 
 int main( int argc, char** argv )
 {
-	ShapeBasedDetector detector = ShapeBasedDetector();
+	EdgeBasedDetector detector = EdgeBasedDetector();
 	OCRClassifier classifier = OCRClassifier();
 
 	detector.testDir("./tests");
