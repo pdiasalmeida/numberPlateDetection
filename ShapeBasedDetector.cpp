@@ -100,7 +100,7 @@ void ShapeBasedDetector::saveInterestAreas()
 	{
 		std::stringstream ss;
 		ss << index;
-		cv::imwrite( _cImgpath+"_plate_"+ss.str()+".jpg", cv::Mat( _cImage, *it ) );
+		cv::imwrite( "./results/"+_cImgName+"_plate_"+ss.str()+".jpg", cv::Mat( _cImage, *it ) );
 		index++;
 	}
 }
@@ -188,8 +188,8 @@ void ShapeBasedDetector::testDir( std::string path )
 	std::set< std::string >::iterator it = _files.begin();
 	for( ; it != _files.end(); it++ )
 	{
-		_cImgpath = path+"/"+(*it);
-		cv::Mat img = cv::imread(_cImgpath);
+		_cImgName = (*it);
+		cv::Mat img = cv::imread(path+"/"+_cImgName);
 		setImage(img);
 
 		detect(img);

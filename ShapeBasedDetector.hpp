@@ -1,7 +1,7 @@
 #ifndef SHAPEBASEDDETECTOR_HPP_
 #define SHAPEBASEDDETECTOR_HPP_
 
-#include "Plate.hpp"
+#include <opencv2/core/core.hpp>
 
 #include <set>
 
@@ -38,13 +38,10 @@ protected:
 	cv::Mat _countOut;
 	cv::Mat _result;
 
-	std::string _cImgpath;
+	std::string _cImgName;
 
 	std::vector< cv::Rect > _interestAreas;
-	std::vector< Plate > _output;
 	std::set< std::string > _files;
-
-	bool _showSteps;
 
 	int _threshLower;
 	int _threshUpper;
@@ -60,6 +57,8 @@ protected:
 	double _minShapeArea;
 	double _ratio;
 	double _rerror;
+
+	bool _showSteps;
 };
 
 #endif /* SHAPEBASEDDETECTOR_HPP_ */
